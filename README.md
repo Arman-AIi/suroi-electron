@@ -49,7 +49,7 @@ and run the same command
 ``` sh
 npm install electron --save-dev
 ```
-Repeat this step for the server and tests folders.
+Repeat this step for the common, server and tests folders.
 
 
 ## Development
