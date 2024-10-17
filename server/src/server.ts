@@ -1,5 +1,5 @@
 import { Cron } from "croner";
-import { existsSync, readFile, writeFile, writeFileSync } from "fs";
+import { existsSync, readFile, readFileSync, writeFile, writeFileSync } from "fs";
 import { URLSearchParams } from "node:url";
 import os from "os";
 import { type WebSocket } from "uWebSockets.js";
@@ -17,6 +17,7 @@ import { CustomTeam, CustomTeamPlayer, type CustomTeamPlayerContainer } from "./
 import { Logger } from "./utils/misc";
 import { cors, createServer, forbidden, getIP, textDecoder } from "./utils/serverHelpers";
 import { cleanUsername } from "./utils/misc";
+import ProxyCheck from "proxycheck-ts";
 
 export interface Punishment {
     readonly id: string
@@ -30,7 +31,29 @@ export interface Punishment {
 
 let punishments: Punishment[] = [];
 
-let ipBlocklist: string[] | undefined;
+const proxyCheck = Config.protection?.proxyCheckAPIKey
+    ? new ProxyCheck({ api_key: Config.protection.proxyCheckAPIKey })
+    : undefined;
+
+const isVPN = new Map<string, boolean>(
+    existsSync("isVPN.json")
+        ? Object.entries(JSON.parse(readFileSync("isVPN.json", "utf8")))
+        : undefined
+);
+
+async function isVPNCheck(ip: string): Promise<boolean> {
+    if (!proxyCheck) return false;
+
+    let ipIsVPN = isVPN.get(ip);
+    if (ipIsVPN !== undefined) return ipIsVPN;
+
+    const result = await proxyCheck.checkIP(ip, { vpn: 3 }, 5000);
+    if (result?.status !== "ok") return false;
+
+    ipIsVPN = result[ip].proxy === "yes" || result[ip].vpn === "yes";
+    isVPN.set(ip, ipIsVPN);
+    return ipIsVPN;
+}
 
 function removePunishment(ip: string): void {
     punishments = punishments.filter(p => p.ip !== ip);
@@ -96,11 +119,13 @@ if (isMainThread) {
                 removePunishment(ip);
             }
             response = { success: false, message: punishment.punishmentType, reason: punishment.reason, reportID: punishment.reportId };
-        } else if (ipBlocklist?.includes(ip)) {
-            response = { success: false, message: "perma" };
+
         } else {
-            const teamID = new URLSearchParams(req.getQuery()).get("teamID");
-            if (teamID) {
+            const teamID = maxTeamSize !== TeamSize.Solo && new URLSearchParams(req.getQuery()).get("teamID"); // must be here or it causes uWS errors
+            if (await isVPNCheck(ip)) {
+                response = { success: false, message: "perma", reason: "VPN/proxy detected. To play the game, please disable it." };
+
+            } else if (teamID) {
                 const team = customTeams.get(teamID);
                 if (team?.gameID !== undefined) {
                     response = games[team.gameID]
@@ -109,6 +134,7 @@ if (isMainThread) {
                 } else {
                     response = { success: false };
                 }
+
             } else {
                 response = findGame();
             }
@@ -368,21 +394,12 @@ if (isMainThread) {
 
                 teamsCreated = {};
 
+                if (protection.proxyCheckAPIKey) {
+                    writeFileSync("isVPN.json", JSON.stringify(Object.fromEntries(isVPN)));
+                }
+
                 Logger.log("Reloaded punishment list");
             }, protection.refreshDuration);
-
-            const ipBlocklistURL = protection.ipBlocklistURL;
-
-            if (ipBlocklistURL !== undefined) {
-                void (async() => {
-                    try {
-                        const response = await fetch(ipBlocklistURL);
-                        ipBlocklist = (await response.text()).split("\n").map(line => line.split("/")[0]);
-                    } catch (e) {
-                        console.error("Error: Unable to load IP blocklist. Details:", e);
-                    }
-                })();
-            }
         }
     });
 }
