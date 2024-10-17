@@ -46,9 +46,8 @@ import { PluginManager } from "./pluginManager";
 import { Team } from "./team";
 import { Grid } from "./utils/grid";
 import { IDAllocator } from "./utils/idAllocator";
-import { Logger, removeFrom } from "./utils/misc";
+import { cleanUsername, Logger, removeFrom } from "./utils/misc";
 import { createServer, forbidden, getIP } from "./utils/serverHelpers";
-import { cleanUsername } from "./utils/usernameFilter";
 
 /*
     eslint-disable
@@ -268,8 +267,8 @@ export class Game implements GameData {
                     const { simultaneousConnections, joinAttempts } = This;
 
                     if (
-                        (simultaneousConnections[ip] >= (maxSimultaneousConnections ?? Infinity))
-                        || (joinAttempts[ip] >= (maxJoinAttempts?.count ?? Infinity))
+                        simultaneousConnections[ip] >= (maxSimultaneousConnections ?? Infinity)
+                        || joinAttempts[ip] >= (maxJoinAttempts?.count ?? Infinity)
                     ) {
                         Logger.log(`Game ${This.id} | Rate limited: ${ip}`);
                         forbidden(res);
@@ -286,15 +285,15 @@ export class Game implements GameData {
                     }
                 }
 
-                const searchParams = new URLSearchParams(req.getQuery());
-
                 //
                 // Ensure IP is allowed
                 //
-                if ((This.allowedIPs.get(ip) ?? Infinity) < This.now) {
+                if ((This.allowedIPs.get(ip) ?? 0) < This.now) {
                     forbidden(res);
                     return;
                 }
+
+                const searchParams = new URLSearchParams(req.getQuery());
 
                 //
                 // Validate and parse role and name color
