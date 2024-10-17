@@ -4,6 +4,7 @@ var createWindow = function () {
         width: 1920,
         height: 1080
     });
+    win.setBackgroundColor('hsl(113, 42%, 42%)');
     win.loadURL('http://localhost:3000');
 };
 app.whenReady().then(function () {
