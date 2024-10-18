@@ -5,10 +5,15 @@ const createWindow = () => {
     width: 1920,
     height: 1080,
     frame: false,
-    backgroundColor:'hsl(113, 42%, 42%)'
+    backgroundColor:'hsl(28, 100%, 50%)'
   })
-  win.loadURL('http://localhost:3000')
+  win.loadFile('suroi_loading_screen.svg')
+  setTimeout(() => {
+    win.reload();
+    win.loadURL('http://localhost:3000')
+  }, 20000);
 }
+
 
 app.whenReady().then(() => {
   createWindow()
