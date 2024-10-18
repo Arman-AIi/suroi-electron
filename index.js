@@ -1,10 +1,12 @@
 var _a = require('electron/main'), app = _a.app, BrowserWindow = _a.BrowserWindow;
 var createWindow = function () {
     var win = new BrowserWindow({
-        width: 1920,
-        height: 1080
+        width: 1900,
+        height: 1080,
+        frame: false,
+        backgroundColor: 'hsl(113, 42%, 42%)'
     });
-    win.setBackgroundColor('hsl(113, 42%, 42%)');
+    win.loadFile('suroi.svg');
     win.loadURL('http://localhost:3000');
 };
 app.whenReady().then(function () {

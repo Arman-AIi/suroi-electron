@@ -3,11 +3,10 @@ const { app, BrowserWindow } = require('electron/main')
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 1920,
-    height: 1080
-    
+    height: 1080,
+    frame: false,
+    backgroundColor:'hsl(113, 42%, 42%)'
   })
-  win.setBackgroundColor('hsl(113, 42%, 42%)')
-
   win.loadURL('http://localhost:3000')
 }
 
