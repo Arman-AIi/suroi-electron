@@ -7,7 +7,7 @@ const createWindow = () => {
     frame: false,
     backgroundColor:'hsl(28, 100%, 50%)'
   })
-  win.loadFile('suroi_loading_screen.svg')
+  win.loadFile('client/loading.html')
   setTimeout(() => {
     win.reload();
     win.loadURL('http://localhost:3000')
