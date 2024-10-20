@@ -7,7 +7,7 @@
     "build": "pnpm -r build",
     "build:client": "cd client && pnpm build",
     "build:server": "cd server && pnpm build",
-    "start": "tsc index.ts && concurrently \"npm run dev\" \"electron .\"",
+    "start": "electron-forge start",
     "moderation": "node --enable-source-maps server/dist/server/src/moderation.js",
     "warn": "pnpm moderation warn",
     "ban": "pnpm moderation ban",
@@ -22,7 +22,9 @@
     "lint:ci": "eslint . --max-warnings 0",
     "validateDefinitions": "cd tests && pnpm run build && pnpm validateDefinitions",
     "sanity-check": "pnpm lint:check && pnpm typecheck && pnpm validateDefinitions",
-    "full-reinstall": "rm -r node_modules pnpm-lock.yaml client/node_modules server/node_modules common/node_modules tests/node_modules && pnpm install"
+    "full-reinstall": "rm -r node_modules pnpm-lock.yaml client/node_modules server/node_modules common/node_modules tests/node_modules && pnpm install",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -34,6 +36,14 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
+    "@electron-forge/cli": "^7.5.0",
+    "@electron-forge/maker-deb": "^7.5.0",
+    "@electron-forge/maker-rpm": "^7.5.0",
+    "@electron-forge/maker-squirrel": "^7.5.0",
+    "@electron-forge/maker-zip": "^7.5.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.5.0",
+    "@electron-forge/plugin-fuses": "^7.5.0",
+    "@electron/fuses": "^1.8.0",
     "@eslint/js": "^9.11.1",
     "@stylistic/eslint-plugin": "^2.8.0",
     "@types/eslint__js": "^8.42.3",
@@ -41,11 +51,13 @@
     "concurrently": "^9.0.1",
     "electron": "^32.2.1",
     "eslint": "^9.11.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
     "typescript-eslint": "8.5.0"
   },
   "dependencies": {
     "concurrently": "^9.0.1",
+    "electron-squirrel-startup": "^1.0.1",
     "pnpm": ">=9.5.0",
     "typescript": "^5.6.2"
   },

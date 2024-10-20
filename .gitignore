@@ -32,3 +32,4 @@ build/
 
 # try to prevent error moments from happening (no pun intended)
 .env
+out/
