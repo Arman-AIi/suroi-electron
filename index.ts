@@ -1,4 +1,5 @@
 const { app, BrowserWindow, screen: electronScreen } = require('electron/main');
+const net = require('net');
 
 const createWindow = () => {
   const { width, height } = electronScreen.getPrimaryDisplay().workAreaSize;
@@ -12,10 +13,22 @@ const createWindow = () => {
 
   win.loadFile('client/loading.html');
 
-  setTimeout(() => {
-    win.reload();
-    win.loadURL('http://localhost:3000');
-  }, 20000);
+  const checkServer = () => {
+    const socket = new net.Socket();
+    socket.once('error', (err) => {
+      // console.error('Server not ready yet:', err);
+      setTimeout(checkServer, 500); // Check again in 500ms
+    });
+    socket.once('connect', () => {
+      socket.destroy();
+      console.log('Server is ready!');
+      win.reload();
+      win.loadURL('http://localhost:3000');
+    });
+    socket.connect(3000, 'localhost');
+  };
+
+  checkServer(); // Start checking immediately
 };
 
 
