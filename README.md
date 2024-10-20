@@ -30,7 +30,7 @@ Any amount helps! All donation money goes towards keeping the servers running.
 [discord.suroi.io](https://discord.suroi.io)
 
 ## Installation and setup
-Start by installing [Node.js](https://nodejs.org)
+Start by installing [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io)
 
 Next, use the following command to clone it:
 ```sh
@@ -39,16 +39,14 @@ git clone https://github.com/Arman-AIi/suroi-electron.git
 
 To install electron's dependencies, open a terminal in the project root, and run this command:
 ```sh
-npm install electron --save-dev
+pnpm install electron --save-dev
 ```
 Next, run it in the client folder
 ``` sh
 cd client
 ```
-and run the same command
-``` sh
-npm install electron --save-dev
-```
+and run the same command.
+
 Repeat this step for the common, server and tests folders.
 
 
@@ -56,13 +54,8 @@ Repeat this step for the common, server and tests folders.
 To run the game locally, open a terminal in the project root and run the following:
 
 ```sh
-npm run start
+pnpm start
 ```
 This will launch the electron app if you have set it up correctly.
 
-## Production
-To build for production, run this command in the project root:
-```sh
-npm run build
-```
 
