@@ -16,8 +16,7 @@ const createWindow = () => {
   const checkServer = () => {
     const socket = new net.Socket();
     socket.once('error', (err) => {
-      // console.error('Server not ready yet:', err);
-      setTimeout(checkServer, 500); // Check again in 500ms
+      setTimeout(checkServer, 500); 
     });
     socket.once('connect', () => {
       socket.destroy();
@@ -28,7 +27,7 @@ const createWindow = () => {
     socket.connect(3000, 'localhost');
   };
 
-  checkServer(); // Start checking immediately
+  checkServer();
 };
 
 
